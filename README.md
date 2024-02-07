@@ -1,5 +1,5 @@
 <div align="center">
-<img width="150" alt="saleor-app-template" src="https://user-images.githubusercontent.com/4006792/215185065-4ef2eda4-ca71-48cc-b14b-c776e0b491b6.png">
+<img width="150" alt="saleor-app-template" src="https://github.com/krzysztofzuraw/dummy-shipping-app/blob/main/public/logo.png?raw=true">
 </div>
 
 <div align="center">
@@ -15,6 +15,24 @@
   <span> | </span>
   <a href="https://docs.saleor.io/docs/3.x/">Docs</a>
 </div>
+
+## Business case
+
+You want to integrate third-party Shipping API with Saleor. This application operates on 3 webhooks:
+
+- `SHIPPING_LIST_METHODS_FOR_CHECKOUT`
+- `ORDER_FILTER_SHIPPING_METHODS`
+- `ORDER_CREATED`
+
+### SHIPPING_LIST_METHODS_FOR_CHECKOUT
+
+Here you can ask third-party API for shipping methods for given checkout session. As checkout can be created with or without shipping address you may need additional logic for those two cases.
+
+Docs
+
+### ORDER_FILTER_SHIPPING_METHODS
+
+### ORDER_CREATED
 
 ## Development
 
@@ -121,3 +139,11 @@ The choice of the APL is made using the `APL` environment variable. If the value
 - `upstash`: use [Upstash](https://upstash.com/) Redis as storage method. Free account required. It can be used for development and production and supports multi-tenancy. Requires `UPSTASH_URL` and `UPSTASH_TOKEN` environment variables to be set
 
 If you want to use your own database, you can implement your own APL. [Check the documentation to read more.](https://github.com/saleor/saleor-app-sdk/blob/main/docs/apl.md)
+
+### Running Bruno
+
+If you have your application up and running inside Saleor Dashboard now its time to run GraphQL mutations. To get started you need:
+
+1. Create `.env` inside `bruno` folder based on `.env.example`
+2. Fill the needed env variables
+3. Open Bruno and send request in sequence they are defined to make full checkout flow
