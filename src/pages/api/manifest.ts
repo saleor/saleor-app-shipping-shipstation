@@ -2,6 +2,7 @@ import { createManifestHandler } from "@saleor/app-sdk/handlers/next";
 import { AppManifest } from "@saleor/app-sdk/types";
 
 import packageJson from "../../../package.json";
+import { orderCreatedWebhook } from "./webhooks/order-created";
 import { orderFilterShippingMethodsWebhook } from "./webhooks/order-filter-shipping-methods";
 import { shippingListMethodsForCheckoutWebhook } from "./webhooks/shipping-list-methods-for-checkout";
 
@@ -19,6 +20,7 @@ export default createManifestHandler({
       id: "saleor.app",
       version: packageJson.version,
       webhooks: [
+        orderCreatedWebhook.getWebhookManifest(apiBaseURL),
         shippingListMethodsForCheckoutWebhook.getWebhookManifest(apiBaseURL),
         orderFilterShippingMethodsWebhook.getWebhookManifest(apiBaseURL),
       ],

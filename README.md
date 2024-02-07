@@ -3,40 +3,18 @@
 </div>
 
 <div align="center">
-  <h1>Saleor App Template</h1>
+  <h1>Dummy Shipping App</h1>
 </div>
 
 <div align="center">
-  <p>Bare-bones boilerplate for writing Saleor Apps with Next.js.</p>
+  <p>Example app that connects to third-party Shipping API and works with Saleor.</p>
 </div>
 
 <div align="center">
   <a href="https://saleor.io/">Website</a>
   <span> | </span>
   <a href="https://docs.saleor.io/docs/3.x/">Docs</a>
-  <span> | </span>
-    <a href="https://githubbox.com/saleor/saleor-app-template">CodeSandbox</a>
 </div>
-
-### What is Saleor App
-
-Saleor App is the fastest way of extending Saleor with custom logic using [asynchronous](https://docs.saleor.io/docs/3.x/developer/extending/apps/asynchronous-webhooks) and [synchronous](https://docs.saleor.io/docs/3.x/developer/extending/apps/synchronous-webhooks/key-concepts) webhooks (and vast Saleor's API). In most cases, creating an App consists of two tasks:
-
-- Writing webhook's code executing your custom logic.
-- Developing configuration UI to be displayed in Saleor Dashboard via specialized view (designated in the App's manifest).
-
-### What's included?
-
-- 🚀 Communication between Saleor instance and Saleor App
-- 📖 Manifest with webhooks using custom query
-
-### Why Next.js
-
-You can use any preferred technology to create Saleor Apps, but Next.js is among the most efficient for two reasons. The first is the simplicity of maintaining your API endpoints/webhooks and your apps' configuration React front-end in a single, well-organized project. The second reason is the ease and quality of local development and deployment.
-
-### Learn more about Apps
-
-[Apps guide](https://docs.saleor.io/docs/3.x/developer/extending/apps/key-concepts)
 
 ## Development
 
@@ -47,6 +25,7 @@ Before you start, make sure you have installed:
 - [Node.js](https://nodejs.org/en/)
 - [pnpm](https://pnpm.io/)
 - [Saleor CLI](https://docs.saleor.io/docs/3.x/cli) - optional, but recommended
+- [Bruno](https://www.usebruno.com/) - for API calls
 
 ### With CLI
 
@@ -111,7 +90,7 @@ pnpm dev
 ```
 
 3. Expose local environment using tunnel:
-Use tunneling tools like [localtunnel](https://github.com/localtunnel/localtunnel) or [ngrok](https://ngrok.com/).
+   Use tunneling tools like [localtunnel](https://github.com/localtunnel/localtunnel) or [ngrok](https://ngrok.com/).
 
 4. Install the application in your dashboard:
 

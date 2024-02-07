@@ -2,13 +2,8 @@ import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
 import { Box, Text } from "@saleor/macaw-ui";
 import gql from "graphql-tag";
 import Link from "next/link";
-import { useLastOrderQuery } from "../generated/graphql";
+import { ShippingMethod, useLastOrderQuery } from "../generated/graphql";
 
-/**
- * GraphQL Code Generator scans for gql tags and generates types based on them.
- * The below query is used to generate the "useLastOrderQuery" hook.
- * If you modify it, make sure to run "pnpm codegen" to regenerate the types.
- */
 gql`
   query LastOrder {
     orders(first: 1) {
@@ -17,23 +12,26 @@ gql`
           id
           number
           created
+          deliveryMethod {
+            ... on ShippingMethod {
+              id
+              name
+            }
+          }
+          metadata {
+            key
+            value
+          }
           user {
             firstName
             lastName
           }
           shippingAddress {
+            streetAddress1
+            postalCode
             country {
               country
             }
-          }
-          total {
-            gross {
-              amount
-              currency
-            }
-          }
-          lines {
-            id
           }
         }
       }
@@ -41,22 +39,18 @@ gql`
   }
 `;
 
-function generateNumberOfLinesText(lines: any[]) {
-  if (lines.length === 0) {
-    return "no lines";
-  }
+const isShippingMethod = (method: any): method is ShippingMethod =>
+  method.__typename === "ShippingMethod";
 
-  if (lines.length === 1) {
-    return "1 line";
+const getShippingMethodName = (method: unknown) => {
+  if (isShippingMethod(method)) {
+    return method.name;
   }
-
-  return `${lines.length} lines`;
-}
+};
 
 export const OrderExample = () => {
   const { appBridge } = useAppBridge();
 
-  // Using the generated hook
   const [{ data, fetching }] = useLastOrderQuery();
   const lastOrder = data?.orders?.edges[0]?.node;
 
@@ -78,11 +72,6 @@ export const OrderExample = () => {
         {fetching && <Text color="textNeutralSubdued">Fetching the last order...</Text>}
         {lastOrder && (
           <>
-            <Text color="textNeutralSubdued">
-              ❗ The <code>orders</code> query requires the <code>MANAGE_ORDERS</code> permission.
-              If you want to query other resources, make sure to update the app permissions in the{" "}
-              <code>/src/pages/api/manifest.ts</code> file.
-            </Text>
             <Box
               backgroundColor={"subdued"}
               padding={4}
@@ -95,13 +84,12 @@ export const OrderExample = () => {
               <Text>{`The last order #${lastOrder.number}:`}</Text>
               <ul>
                 <li>
-                  <Text>{`Contains ${generateNumberOfLinesText(lastOrder.lines)} 🛒`}</Text>
+                  <Text>{`Delivered by ${getShippingMethodName(
+                    lastOrder.deliveryMethod
+                  )} 🚚`}</Text>
                 </li>
                 <li>
-                  <Text>{`For a total amount of ${lastOrder.total.gross.amount} ${lastOrder.total.gross.currency} 💸`}</Text>
-                </li>
-                <li>
-                  <Text>{`Ships to ${lastOrder.shippingAddress?.country.country} 📦`}</Text>
+                  <Text>{`Ships to ${lastOrder.shippingAddress?.streetAddress1} ${lastOrder.shippingAddress?.postalCode} ${lastOrder.shippingAddress?.country.country} 📦`}</Text>
                 </li>
               </ul>
               <Link onClick={() => navigateToOrder(lastOrder.id)} href={`/orders/${lastOrder.id}`}>

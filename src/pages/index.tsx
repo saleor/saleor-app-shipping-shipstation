@@ -64,134 +64,22 @@ const IndexPage: NextPage = () => {
 
   return (
     <Box padding={8}>
-      <Text variant={"hero"}>Welcome to Saleor App Template (Next.js) 🚀</Text>
+      <Text variant={"hero"}>Welcome to Dummy Shipping App 📦</Text>
       <Text as={"p"} marginY={4}>
-        Saleor App Template is a minimalistic boilerplate that provides a working example of a
-        Saleor app.
+        This is a dummy app that demonstrates how to use Saleor Webhooks to create an app that
+        connects to third-party shipping API.
       </Text>
       {appBridgeState?.ready && mounted && (
-        <Link href="/actions">
-          <Button variant="secondary">See what your app can do →</Button>
-        </Link>
+        <>
+          <Text>
+            After you complete full checkout flow (create and complete checkout) click button below
+            to see order:
+          </Text>
+          <Link href="/actions">
+            <Button variant="secondary">See order details →</Button>
+          </Link>
+        </>
       )}
-
-      <Text as={"p"} marginTop={8}>
-        Explore the App Template by visiting:
-      </Text>
-      <ul>
-        <li>
-          <code>/src/pages/api/manifest</code> - the{" "}
-          <a
-            href="https://docs.saleor.io/docs/3.x/developer/extending/apps/manifest"
-            target="_blank"
-            rel="noreferrer"
-          >
-            App Manifest
-          </a>
-          .
-        </li>
-        <li>
-          <code>/src/pages/api/webhooks/order-created</code> - an example <code>ORDER_CREATED</code>{" "}
-          webhook handler.
-        </li>
-        <li>
-          <code>/graphql</code> - the pre-defined GraphQL queries.
-        </li>
-        <li>
-          <code>/generated/graphql.ts</code> - the code generated for those queries by{" "}
-          <a target="_blank" rel="noreferrer" href="https://the-guild.dev/graphql/codegen">
-            GraphQL Code Generator
-          </a>
-          .
-        </li>
-      </ul>
-      <Text variant={"heading"} marginTop={8} as={"h2"}>
-        Resources
-      </Text>
-      <ul>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            href="https://docs.saleor.io/docs/3.x/developer/extending/apps/key-concepts"
-            rel="noreferrer"
-          >
-            <Text color={"text3Decorative"}>Apps documentation </Text>
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            rel="noreferrer"
-            href="https://docs.saleor.io/docs/3.x/developer/extending/apps/developing-with-tunnels"
-          >
-            <Text color={"text3Decorative"}>Tunneling the app</Text>
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/saleor/app-examples"
-          >
-            <Text color={"text3Decorative"}>App Examples repository</Text>
-          </a>
-        </li>
-
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/saleor/saleor-app-sdk"
-          >
-            <Text color={"text3Decorative"}>Saleor App SDK</Text>
-          </a>
-        </li>
-
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            href="https://github.com/saleor/saleor-cli"
-            rel="noreferrer"
-          >
-            <Text color={"text3Decorative"}>Saleor CLI</Text>
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            href="https://github.com/saleor/apps"
-            rel="noreferrer"
-          >
-            <Text color={"text3Decorative"}>Saleor App Store - official apps by Saleor Team</Text>
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            href="https://macaw-ui-next.vercel.app/?path=/docs/getting-started-installation--docs"
-            rel="noreferrer"
-          >
-            <Text color={"text3Decorative"}>Macaw UI - official Saleor UI library</Text>
-          </a>
-        </li>
-        <li>
-          <a
-            onClick={handleLinkClick}
-            target="_blank"
-            href="https://nextjs.org/docs"
-            rel="noreferrer"
-          >
-            <Text color={"text3Decorative"}>Next.js documentation</Text>
-          </a>
-        </li>
-      </ul>
 
       {mounted && !isLocalHost && !appBridgeState?.ready && (
         <>
