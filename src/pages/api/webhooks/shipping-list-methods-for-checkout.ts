@@ -59,18 +59,15 @@ export default shippingListMethodsForCheckoutWebhook.createHandler((req, res, ct
     res
       .status(200)
       .json(dummyAPI.getShippingMethodsForAddressForCheckout(payload.checkout.shippingAddress));
-  }
-
-  if (payload.checkout?.deliveryMethod) {
+  } else if (payload.checkout?.deliveryMethod) {
     // there is delivery method present on checkout
     // call your shipping provider API to set selected shipping method
-    dummyAPI.setShippingMethodForCheckout(payload.checkout.deliveryMethod);
     res.status(200).end();
+  } else {
+    // there is no shipping address or delivery method present on checkout
+    // call your shipping provider API to get available default shipping methods (ones before user enters shipping address)
+    res.status(200).json(dummyAPI.getInitialShippingMethodsForCheckout());
   }
-
-  // there is no shipping address or delivery method present on checkout
-  // call your shipping provider API to get available default shipping methods (ones before user enters shipping address)
-  res.status(200).json(dummyAPI.getInitialShippingMethodsForCheckout());
 });
 
 export const config = {

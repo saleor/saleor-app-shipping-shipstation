@@ -20,10 +20,7 @@ body:graphql {
         shippingMethods {
           id
           name
-          metadata {
-            key
-            value
-          }
+          active
           price {
             amount
             currency
@@ -45,6 +42,16 @@ body:graphql:vars {
       "email": "test@test.com",
       "channel": "{{channelSlug}}",
       "shippingAddress": {
+        "firstName": "Jonathan",
+        "lastName": "Doe",
+        "companyName": "Saleor Commerce",
+        "streetAddress1": "Tęczowa 7",
+        "city": "Wrocław",
+        "postalCode": "53-601",
+        "country": "PL",
+        "phone": "123123123"
+      },
+      "billingAddress": {
         "firstName": "Jonathan",
         "lastName": "Doe",
         "companyName": "Saleor Commerce",

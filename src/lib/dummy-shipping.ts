@@ -15,20 +15,28 @@ export class DummyExternalShippingAPI {
   ];
 
   getInitialShippingMethodsForCheckout() {
-    return [this.dummyShippingMethods[0]];
+    console.log(
+      "Calling external shipping provider API to get initial shipping methods for checkout"
+    );
+    return this.dummyShippingMethods;
   }
 
   getShippingMethodsForAddressForCheckout(_address: unknown) {
+    console.log(
+      "Calling external shipping provider API to get available shipping methods for address"
+    );
     return this.dummyShippingMethods;
   }
 
   setShippingMethodForCheckout(_method: unknown) {
+    console.log("Calling external shipping provider API to set selected shipping method");
     return {
       success: true,
     };
   }
 
   setShippingMethodForOrder(_method: unknown) {
+    console.log("Calling external shipping provider API to set selected shipping method for order");
     return {
       success: true,
     };

@@ -1,7 +1,7 @@
 meta {
   name: Complete checkout
   type: graphql
-  seq: 3
+  seq: 4
 }
 
 post {
@@ -12,25 +12,28 @@ post {
 
 body:graphql {
   mutation CompleteCheckout($checkoutId: ID!) {
-    checkoutComplete(id: $checkoutId, redirectUrl: "http://localhost", paymentData: "{}") {
+    checkoutComplete(
+      id: $checkoutId
+      redirectUrl: "http://localhost"
+      paymentData: "{}"
+    ) {
+      errors {
+        field
+        message
+        code
+      }
       order {
         id
         status
+        metadata {
+          key
+          value
+        }
         deliveryMethod {
           ... on ShippingMethod {
             id
             name
           }
-        }
-        shippingMethodName
-        shippingMethods {
-          id
-          name
-        }
-        errors {
-          field
-          message
-          code
         }
       }
     }
