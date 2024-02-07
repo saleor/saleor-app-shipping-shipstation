@@ -1,0 +1,40 @@
+meta {
+  name: Update delivery method
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{API_URL}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation UpdateDeliveryMethod($checkoutId: ID!, $deliveryMethodId: ID!) {
+    checkoutDeliveryMethodUpdate(
+      id: $checkoutId
+      deliveryMethodId: $deliveryMethodId
+    ) {
+      checkout {
+        deliveryMethod {
+          ... on ShippingMethod {
+            id
+            name
+          }
+        }
+      }
+      errors {
+        code
+        message
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "checkoutId": "{{checkoutId}}",
+    "deliveryMethodId": "{{selectedShippingMethodId}}"
+  }
+}
