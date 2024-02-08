@@ -13,26 +13,35 @@
 <div align="center">
   <a href="https://saleor.io/">Website</a>
   <span> | </span>
-  <a href="https://docs.saleor.io/docs/3.x/">Docs</a>
+  <a href="https://docs.saleor.io/docs/3.x/developer/checkout/address">Docs</a>
 </div>
 
-## Business case
+## Introduction
 
-You want to integrate third-party Shipping API with Saleor. This application operates on 3 webhooks:
+This app is an example of how to integrate with the Saleor shipping API. The diagram below illustrates the flow of requests (S represents subscription, M represents mutation):
 
-- `SHIPPING_LIST_METHODS_FOR_CHECKOUT`
-- `ORDER_FILTER_SHIPPING_METHODS`
-- `ORDER_CREATED`
+```mermaid
+sequenceDiagram
+    Customer->>+Saleor: [M] checkoutCreate
+    Saleor->>+Shipping App: [S] ShippingListMethodsForCheckout
+    Shipping App-->>-Saleor: getInitialShippingMethodsForCheckout
+    Saleor-->>-Customer: shippingMethods
+    Customer->>+Saleor: [M] checkoutDeliveryMethodUpdate
+    Saleor->>+Shipping App: [S] ShippingListMethodsForCheckout
+    Shipping App-->>-Saleor: getShippingMethodsForAddressForCheckout
+    Saleor-->>-Customer: shippingMethods
+    Customer->>+Saleor: [M] checkoutComplete
+    Saleor->>+Shipping App: [S] OrderCreated
+    Shipping App-->>-Saleor: setShippingMethodForOrder
+```
 
-### SHIPPING_LIST_METHODS_FOR_CHECKOUT
+### ShippingListMethodsForCheckout
 
-Here you can ask third-party API for shipping methods for given checkout session. As checkout can be created with or without shipping address you may need additional logic for those two cases.
+You can use the third-party API to request shipping methods for a given checkout session. Since a checkout can be created with or without a shipping address, you may need additional logic for these two scenarios. For more information, refer to the [documentation](https://docs.saleor.io/docs/3.x/api-reference/checkout/objects/shipping-list-methods-for-checkout).
 
-Docs
+### OrderCreated
 
-### ORDER_FILTER_SHIPPING_METHODS
-
-### ORDER_CREATED
+Used to tell third-party API that checkout session is completed and order with shipping method is created. [Docs](https://docs.saleor.io/docs/3.x/api-reference/orders/objects/order-created)
 
 ## Development
 

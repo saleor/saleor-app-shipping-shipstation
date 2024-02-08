@@ -22,7 +22,6 @@ const OrderCreatedWebhookPayload = gql`
 `;
 
 const OrderCreatedGraphqlSubscription = gql`
-  # Payload fragment must be included in the root query
   ${OrderCreatedWebhookPayload}
   subscription OrderCreated {
     event {
