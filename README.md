@@ -18,30 +18,46 @@
 
 ## Introduction
 
-This app is an example of how to integrate with the Saleor shipping API. The diagram below illustrates the flow of requests (S represents subscription, M represents mutation):
+This app is an example of how to integrate with the Saleor shipping API. The diagram below illustrates the flow of requests:
 
 ```mermaid
 sequenceDiagram
-    Customer->>+Saleor: [M] checkoutCreate
-    Saleor->>+Shipping App: [S] ShippingListMethodsForCheckout
+    Customer->>+Saleor: checkoutCreate
+    Saleor->>+Shipping App: ShippingListMethodsForCheckout
     Shipping App-->>-Saleor: getInitialShippingMethodsForCheckout
     Saleor-->>-Customer: shippingMethods
-    Customer->>+Saleor: [M] checkoutDeliveryMethodUpdate
-    Saleor->>+Shipping App: [S] ShippingListMethodsForCheckout
+    Customer->>+Saleor: checkoutDeliveryMethodUpdate
+    Saleor->>+Shipping App: ShippingListMethodsForCheckout
     Shipping App-->>-Saleor: getShippingMethodsForAddressForCheckout
     Saleor-->>-Customer: shippingMethods
-    Customer->>+Saleor: [M] checkoutComplete
-    Saleor->>+Shipping App: [S] OrderCreated
+    Customer->>+Saleor: checkoutComplete
+    Saleor->>+Shipping App: OrderCreated
     Shipping App-->>-Saleor: setShippingMethodForOrder
 ```
 
-### ShippingListMethodsForCheckout
+### Subscriptions
+
+#### ShippingListMethodsForCheckout
 
 You can use the third-party API to request shipping methods for a given checkout session. Since a checkout can be created with or without a shipping address, you may need additional logic for these two scenarios. For more information, refer to the [documentation](https://docs.saleor.io/docs/3.x/api-reference/checkout/objects/shipping-list-methods-for-checkout).
 
-### OrderCreated
+#### OrderCreated
 
 Used to tell third-party API that checkout session is completed and order with shipping method is created. [Docs](https://docs.saleor.io/docs/3.x/api-reference/orders/objects/order-created)
+
+### Mutations
+
+Standard flow for storefront:
+
+1. `checkoutCreate`. Creates checkout with shipping address.
+2. `checkoutDeliveryMethodUpdate`. Select delivery method.
+3. `checkoutComplete`. Completes checkout and creates an order.
+
+### How to test whole flow?
+
+1. Configure your dashboard channel to `Allow unpaid orders`
+2. Run app in [development](#development) mode
+3. Send requests via [Bruno](#running-bruno)
 
 ## Development
 

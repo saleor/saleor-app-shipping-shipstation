@@ -62,6 +62,7 @@ export default shippingListMethodsForCheckoutWebhook.createHandler((req, res, ct
   } else if (payload.checkout?.deliveryMethod) {
     // there is delivery method present on checkout
     // call your shipping provider API to set selected shipping method
+    dummyAPI.setShippingMethodForCheckout(payload.checkout.deliveryMethod);
     res.status(200).end();
   } else {
     // there is no shipping address or delivery method present on checkout
