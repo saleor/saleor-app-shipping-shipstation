@@ -41,6 +41,12 @@ export const orderCreatedWebhook = new SaleorAsyncWebhook<OrderCreatedWebhookPay
 export default orderCreatedWebhook.createHandler((req, res, ctx) => {
   const { payload } = ctx;
   console.log("Order created with: ", payload);
+
+  // https://www.shipstation.com/docs/api/orders/create-update-order/
+
+  // To get the chosen Shipstation shipping method, decode the shipping method ID - eg app:saleor.app:usps_priority_mail_international
+  // the last part of the shipping method ID can be used to create the Order in the API and later used for creating the label
+
   const dummyAPI = new DummyExternalShippingAPI();
   // send selected shipping method on order to your shipping provider API
   dummyAPI.setShippingMethodForOrder(payload.order?.deliveryMethod);

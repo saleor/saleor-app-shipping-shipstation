@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-  <h1>Dummy Shipping App</h1>
+  <h1>Dummy Shipping App x Shipstation</h1>
 </div>
 
 <div align="center">
@@ -55,9 +55,8 @@ Standard flow for storefront:
 
 ### How to test whole flow?
 
-1. Configure your dashboard channel to `Allow unpaid orders`
-2. Run app in [development](#development) mode
-3. Send requests via [Bruno](#running-bruno)
+1. Run app in [development](#development) mode
+2. Send requests via [Bruno](#running-bruno)
 
 ## Development
 
@@ -172,3 +171,13 @@ If you have your application up and running inside Saleor Dashboard now its time
 1. Create `.env` inside `bruno` folder based on `.env.example`
 2. Fill the needed env variables
 3. Open Bruno and send request in sequence they are defined to make full checkout flow
+
+
+### Limitations
+
+- carriers list is hardcoded in the envs, and at the moment only one is supported
+- all saleor variants have to follow the same weight unit
+- the app assumes the shipping rates returned from the Shipstation are using USD as currency - channel configuration should follow this format
+- considering SLIM shipstation rate limits (40 req/s) mitigation measures should be taken
+  - aggressive caching (based on postalCodes and checkout weight)
+  - contacting Shipstation to modify the limits

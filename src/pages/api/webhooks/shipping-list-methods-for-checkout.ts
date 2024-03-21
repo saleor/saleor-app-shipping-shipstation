@@ -1,18 +1,25 @@
 import { SaleorSyncWebhook } from "@saleor/app-sdk/handlers/next";
 import { gql } from "urql";
 import { ShippingListMethodsPayloadFragment } from "../../../../generated/graphql";
-import { DummyExternalShippingAPI } from "../../../lib/dummy-shipping";
 import { saleorApp } from "../../../saleor-app";
+import { ShipstationShippingAPI } from "../../../lib/shipstation-shipping";
+import { sumAndFormatSaleorWeights } from "../../../lib/sum-and-format-saleor-weights";
+import { notEmpty } from "../../../lib/not-empty";
+import { ENV_CONFIG } from "../../../env-config";
 
 const ShippingListMethodsPayload = gql`
   fragment ShippingListMethodsPayload on ShippingListMethodsForCheckout {
     checkout {
+      lines {
+        id
+        variant {
+          weight {
+            unit
+            value
+          }
+        }
+      }
       shippingAddress {
-        firstName
-        lastName
-        streetAddress1
-        streetAddress2
-        city
         postalCode
         country {
           code
@@ -47,28 +54,45 @@ export const shippingListMethodsForCheckoutWebhook =
     query: ShippingListMethodsForCheckoutSubscription,
   });
 
-export default shippingListMethodsForCheckoutWebhook.createHandler((req, res, ctx) => {
+export default shippingListMethodsForCheckoutWebhook.createHandler(async (req, res, ctx) => {
   const { payload } = ctx;
   console.log("Shipping List Methods for Checkout Webhook received with: ", payload);
 
-  const dummyAPI = new DummyExternalShippingAPI();
+  const checkout = payload.checkout;
 
-  if (payload.checkout?.shippingAddress) {
-    // there is shipping address present on checkout
-    // call your shipping provider API to get available shipping methods
-    res
-      .status(200)
-      .json(dummyAPI.getShippingMethodsForAddressForCheckout(payload.checkout.shippingAddress));
-  } else if (payload.checkout?.deliveryMethod) {
-    // there is delivery method present on checkout
-    // call your shipping provider API to set selected shipping method
-    dummyAPI.setShippingMethodForCheckout(payload.checkout.deliveryMethod);
+  if (!checkout) {
+    // the checkout payload is missing
+    // return 200 OK to Saleor to acknowledge the webhook
+    console.debug("No checkout data in the payload");
     res.status(200).end();
-  } else {
-    // there is no shipping address or delivery method present on checkout
-    // call your shipping provider API to get available default shipping methods (ones before user enters shipping address)
-    res.status(200).json(dummyAPI.getInitialShippingMethodsForCheckout());
+    return;
   }
+
+  const shippingAddress = checkout.shippingAddress;
+  if (!shippingAddress) {
+    // the address payload is missing
+    // return 200 OK to Saleor to acknowledge the webhook
+    console.debug("No shipping address in the payload");
+    res.status(200).end();
+    return;
+  }
+
+  const shippingApi = new ShipstationShippingAPI({
+    apiKey: ENV_CONFIG.SHIPSTATION_API_KEY,
+    apiSecret: ENV_CONFIG.SHIPSTATION_API_SECRET,
+    carrierCode: ENV_CONFIG.CARRIER_CODES[0],
+    fromPostalCode: ENV_CONFIG.FROM_POSTAL_CODE,
+  });
+
+  res.status(200).json(
+    await shippingApi.getShippingMethodsForAddressForCheckout({
+      toCountry: shippingAddress.country.code,
+      toPostalCode: shippingAddress.postalCode,
+      weight: sumAndFormatSaleorWeights({
+        weights: checkout.lines.map((line) => line.variant.weight).filter(notEmpty),
+      }),
+    })
+  );
 });
 
 export const config = {

@@ -3,7 +3,6 @@ import { AppManifest } from "@saleor/app-sdk/types";
 
 import packageJson from "../../../package.json";
 import { orderCreatedWebhook } from "./webhooks/order-created";
-import { orderFilterShippingMethodsWebhook } from "./webhooks/order-filter-shipping-methods";
 import { shippingListMethodsForCheckoutWebhook } from "./webhooks/shipping-list-methods-for-checkout";
 
 export default createManifestHandler({
@@ -12,17 +11,16 @@ export default createManifestHandler({
     const apiBaseURL = process.env.APP_API_BASE_URL ?? appBaseUrl;
 
     const manifest: AppManifest = {
-      name: "Saleor App Shipping",
+      name: "ShipStation Saleor App",
       tokenTargetUrl: `${apiBaseURL}/api/register`,
       appUrl: iframeBaseUrl,
 
-      permissions: ["MANAGE_ORDERS", "MANAGE_CHECKOUTS", "IMPERSONATE_USER", "MANAGE_SHIPPING"],
-      id: "saleor.app",
+      permissions: ["MANAGE_ORDERS", "MANAGE_CHECKOUTS", "MANAGE_SHIPPING"],
+      id: "saleor.app.shipstation",
       version: packageJson.version,
       webhooks: [
         orderCreatedWebhook.getWebhookManifest(apiBaseURL),
         shippingListMethodsForCheckoutWebhook.getWebhookManifest(apiBaseURL),
-        orderFilterShippingMethodsWebhook.getWebhookManifest(apiBaseURL),
       ],
       extensions: [],
       author: "Saleor Commerce",
