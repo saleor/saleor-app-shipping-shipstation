@@ -22,17 +22,36 @@ This app is an example of how to integrate with the Saleor shipping API. The dia
 
 ```mermaid
 sequenceDiagram
-    Customer->>+Saleor: checkoutCreate
-    Saleor->>+Shipping App: ShippingListMethodsForCheckout
-    Shipping App-->>-Saleor: getInitialShippingMethodsForCheckout
-    Saleor-->>-Customer: shippingMethods
-    Customer->>+Saleor: checkoutDeliveryMethodUpdate
-    Saleor->>+Shipping App: ShippingListMethodsForCheckout
-    Shipping App-->>-Saleor: getShippingMethodsForAddressForCheckout
-    Saleor-->>-Customer: shippingMethods
-    Customer->>+Saleor: checkoutComplete
-    Saleor->>+Shipping App: OrderCreated
-    Shipping App-->>-Saleor: setShippingMethodForOrder
+    Actor C as Customer
+    participant SF as Storefront
+    participant SALEOR as Saleor API
+    participant SSA as Shipstation Shipping App
+    participant SS as Shipstation
+
+    C ->>+ SF: Add products to cart
+    SF ->>+ SALEOR: checkoutCreate/checkoutUpdate
+    SALEOR ->>- SF: Checkout
+    SF ->>- C: Checkout
+    C ->>+ SF: Add shipping address
+    SF ->>+ SALEOR: checkoutCreate/checkoutUpdate
+    SALEOR ->>- SF: Checkout
+    C ->>+ SF: Show me shipping options
+
+    SF ->>+ SALEOR: checkout.shippingMethods
+    SALEOR ->>+ SSA: sync webhook <br> SHIPPING_LIST_METHODS_FOR_CHECKOUT
+    SSA ->> SSA: calculate weight
+    SSA ->> SSA: [todo] determine the package size
+    SSA ->>+ SS: fetch getRates
+    SS ->>- SSA: available rates
+    SSA ->> SSA: format rates to Saleor response type
+    SSA ->>- SALEOR: list of shippingMethods
+    SALEOR ->>- SF: list of shippingMethods
+    SF ->>- C: Shipping options are presented
+
+    C ->>+ SF: Choose a shipping method
+    SF ->>+ SALEOR: checkoutDeliveryMethodUpdate
+    SALEOR ->>- SF: checkout updated
+    SF ->> C: Checkout
 ```
 
 ### Subscriptions
