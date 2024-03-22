@@ -1,7 +1,7 @@
 import { GetRatesResponse } from "./ShipStation/fetch-get-rates";
 import { SaleorShippingMethod } from "./types";
 
-export const mapShipstationRatesToSaleor = (rates: GetRatesResponse[]): SaleorShippingMethod[] => {
+export const mapShipstationRatesToSaleor = (rates: GetRatesResponse): SaleorShippingMethod[] => {
   return rates.map((rate) => {
     return {
       id: rate.serviceCode,

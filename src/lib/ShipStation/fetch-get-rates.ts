@@ -1,5 +1,6 @@
 // Generated based on the ShipStation API documentation:
 
+import { z } from "zod";
 import { Dimensions, Weight } from "./types";
 
 // https://www.shipstation.com/docs/api/shipments/get-rates/
@@ -41,12 +42,16 @@ export interface GetRatesRequest {
   residential?: boolean;
 }
 
-export interface GetRatesResponse {
-  serviceName: string;
-  serviceCode: string;
-  shipmentCost: number;
-  otherCost: number;
-}
+const shipStationRateSchema = z.object({
+  serviceCode: z.string(),
+  serviceName: z.string(),
+  shipmentCost: z.number(),
+  otherCost: z.number(),
+});
+
+const getRatesResponseSchema = z.array(shipStationRateSchema);
+
+export type GetRatesResponse = z.infer<typeof getRatesResponseSchema>;
 
 const GET_RATES_URL = "https://ssapi.shipstation.com/shipments/getrates";
 
@@ -56,7 +61,7 @@ export interface FetchGetRatesProps {
 }
 
 export const fetchGetRates = async ({ input, auth }: FetchGetRatesProps) => {
-  console.log("fetchGetRates starts");
+  console.log("Calling fetchGetRates...");
 
   const response = await fetch(GET_RATES_URL, {
     method: "POST",
@@ -72,8 +77,11 @@ export const fetchGetRates = async ({ input, auth }: FetchGetRatesProps) => {
     throw new Error(`Failed to fetch rates: ${response.statusText}`);
   }
 
-  console.debug("fetchGetRates ok", response);
+  console.debug("fetchGetRates ok");
 
-  // TODO: Add response validation
-  return response.json() as Promise<GetRatesResponse[]>;
+  const rawResponse = await response.json();
+
+  const parsedResponse = getRatesResponseSchema.parse(rawResponse);
+
+  return parsedResponse;
 };

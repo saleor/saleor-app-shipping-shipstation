@@ -1,7 +1,6 @@
-import { getAuthHeader } from "./ShipStation/get-auth-header";
 import { fetchGetRates } from "./ShipStation/fetch-get-rates";
+import { getAuthHeader } from "./ShipStation/get-auth-header";
 import { Weight } from "./ShipStation/types";
-import { mapShipstationRatesToSaleor } from "./map-shipstation-rates-to-saleor";
 
 export interface GetShippingMethodsForAddressForCheckout {
   toCountry: string;
@@ -33,7 +32,6 @@ export class ShipstationShippingAPI {
 
     const shipstationResponse = await fetchGetRates({
       input: {
-        // TODO: add support for multiple carriers
         carrierCode: args.carrierCode,
         serviceCode: null,
         packageCode: null,
@@ -45,8 +43,6 @@ export class ShipstationShippingAPI {
       auth: this.authHeader,
     });
 
-    const rates = mapShipstationRatesToSaleor(shipstationResponse);
-
-    return rates;
+    return shipstationResponse;
   }
 }
