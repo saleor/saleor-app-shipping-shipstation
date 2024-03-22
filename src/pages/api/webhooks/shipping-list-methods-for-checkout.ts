@@ -80,8 +80,6 @@ export default shippingListMethodsForCheckoutWebhook.createHandler(async (req, r
   const shippingApi = new ShipstationShippingAPI({
     apiKey: ENV_CONFIG.SHIPSTATION_API_KEY,
     apiSecret: ENV_CONFIG.SHIPSTATION_API_SECRET,
-    carrierCode: ENV_CONFIG.CARRIER_CODES[0],
-    fromPostalCode: ENV_CONFIG.FROM_POSTAL_CODE,
   });
 
   res.status(200).json(
@@ -91,6 +89,8 @@ export default shippingListMethodsForCheckoutWebhook.createHandler(async (req, r
       weight: sumAndFormatSaleorWeights({
         weights: checkout.lines.map((line) => line.variant.weight).filter(notEmpty),
       }),
+      carrierCode: ENV_CONFIG.CARRIER_CODES[0],
+      fromPostalCode: ENV_CONFIG.FROM_POSTAL_CODE,
     })
   );
 });

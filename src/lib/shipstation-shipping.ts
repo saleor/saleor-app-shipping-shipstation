@@ -7,27 +7,23 @@ export interface GetShippingMethodsForAddressForCheckout {
   toCountry: string;
   toPostalCode: string;
   weight: Weight;
+  carrierCode: string;
+  fromPostalCode: string;
 }
 
 export interface ShipstationShippingAPIProps {
   apiKey: string;
   apiSecret: string;
-  carrierCode: string;
-  fromPostalCode: string;
 }
 
 export class ShipstationShippingAPI {
   private authHeader: string;
-  private carrierCode: string;
-  private fromPostalCode: string;
 
   constructor(props: ShipstationShippingAPIProps) {
     this.authHeader = getAuthHeader({
       apiKey: props.apiKey,
       apiSecret: props.apiSecret,
     });
-    this.carrierCode = props.carrierCode;
-    this.fromPostalCode = props.fromPostalCode;
   }
 
   async getShippingMethodsForAddressForCheckout(args: GetShippingMethodsForAddressForCheckout) {
@@ -38,10 +34,10 @@ export class ShipstationShippingAPI {
     const shipstationResponse = await fetchGetRates({
       input: {
         // TODO: add support for multiple carriers
-        carrierCode: this.carrierCode,
+        carrierCode: args.carrierCode,
         serviceCode: null,
         packageCode: null,
-        fromPostalCode: this.fromPostalCode,
+        fromPostalCode: args.fromPostalCode,
         toCountry: args.toCountry,
         toPostalCode: args.toPostalCode,
         weight: args.weight,
