@@ -30,8 +30,7 @@
     "urql": "^4.0.2",
     "vite": "^4.0.5",
     "vitest": "^0.27.1",
-    "zod": "^3.22.4",
-    "zod-validation-error": "^3.0.3"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "3.3.1",
