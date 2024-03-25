@@ -1,5 +1,9 @@
 // Loads configuration from environment variables and throws an error if any of them is missing
 
+// TODO: migrate to t3-env
+
+const LOG_LEVEL = process.env.LOG_LEVEL || "info";
+
 const rawCarrierCodes = process.env.CARRIER_CODES;
 if (!rawCarrierCodes) {
   throw new Error(
@@ -34,4 +38,5 @@ export const ENV_CONFIG = {
   FROM_POSTAL_CODE,
   SHIPSTATION_API_KEY,
   SHIPSTATION_API_SECRET,
+  LOG_LEVEL,
 };
