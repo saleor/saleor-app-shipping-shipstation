@@ -1,5 +1,6 @@
 <div align="center">
 <img width="150" alt="saleor-app-template" src="https://github.com/krzysztofzuraw/dummy-shipping-app/blob/main/public/logo.png?raw=true">
+</img>
 </div>
 
 <div align="center">
@@ -190,7 +191,6 @@ If you have your application up and running inside Saleor Dashboard now its time
 1. Create `.env` inside `bruno` folder based on `.env.example`
 2. Fill the needed env variables
 3. Open Bruno and send request in sequence they are defined to make full checkout flow
-
 
 ### Limitations
 
