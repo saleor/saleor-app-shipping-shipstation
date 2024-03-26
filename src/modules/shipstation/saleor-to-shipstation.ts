@@ -19,6 +19,7 @@ const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
   const weights = lines.map((line) => line.variant.weight).filter(notEmpty);
 
   if (weights.length === 0) {
+    // TODO: should we throw an error here?
     logger.trace("No weights found, returning 0 grams");
 
     return {
