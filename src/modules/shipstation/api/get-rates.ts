@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { ShipStationApiClient } from "./shipstation-api-client";
-import { logger } from "../../../lib/logger";
+import { createLogger } from "../../../lib/logger";
 import { Dimensions, Weight } from "../types";
 
 // https://www.shipstation.com/docs/api/shipments/get-rates/
@@ -56,10 +56,12 @@ const getRatesResponseSchema = z.array(shipStationRateSchema);
 export type GetRatesResponse = z.infer<typeof getRatesResponseSchema>;
 
 export class GetRatesClient {
+  private logger = createLogger("GetRatesClient");
   constructor(private apiClient: ShipStationApiClient) {}
 
   async getRates(input: GetRatesRequest) {
     try {
+      this.logger.debug({ input }, "Getting rates with following input: ");
       const response = await this.apiClient.query("/shipments/getrates", {
         method: "POST",
         body: input,
@@ -68,7 +70,7 @@ export class GetRatesClient {
       const parseResult = getRatesResponseSchema.safeParse(response);
 
       if (!parseResult.success) {
-        logger.warn(
+        this.logger.warn(
           { json: response },
           "Failed to provide detailed error message from ShipStation API."
         );

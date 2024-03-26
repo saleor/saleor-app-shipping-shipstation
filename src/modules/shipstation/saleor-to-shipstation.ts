@@ -1,6 +1,9 @@
-import { CheckoutLine, CheckoutLineFragment, WeightUnitsEnum } from "../../../generated/graphql";
+import { CheckoutLineFragment, WeightUnitsEnum } from "../../../generated/graphql";
+import { createLogger } from "../../lib/logger";
 import { notEmpty } from "../../lib/not-empty";
 import { Weight, WeightUnits } from "./types";
+
+const logger = createLogger("saleorToShipstation");
 
 /**
  * The function takes a list of Saleor weights and sums them up. Output follows Shipstation weight format.
@@ -11,11 +14,13 @@ import { Weight, WeightUnits } from "./types";
  * - If the unit is not supported, it throws an error
  * - All of the provided weights are in the same unit
  */
+// todo: test
 const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
   const weights = lines.map((line) => line.variant.weight).filter(notEmpty);
 
   if (weights.length === 0) {
-    console.debug("No weights found, returning 0 grams");
+    logger.trace("No weights found, returning 0 grams");
+
     return {
       value: 0,
       units: WeightUnits.Grams,
@@ -44,8 +49,7 @@ const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
   const convertedUnit = weightMap[unit];
 
   if (convertedUnit === undefined) {
-    console.error("Unsupported weight unit", unit);
-    throw new Error("Unsupported weight unit");
+    throw new Error(`${unit} is not a supported weight unit`);
   }
 
   return {

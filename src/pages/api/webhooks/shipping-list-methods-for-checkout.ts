@@ -82,7 +82,7 @@ export default shippingListMethodsForCheckoutWebhook.createHandler(async (req, r
       fromPostalCode,
     });
 
-    logger.debug({ saleorShippingMethods }, "Saleor shipping methods: ");
+    logger.debug({ saleorShippingMethods }, "Responding to Saleor with shipping methods: ");
 
     return res.status(200).json(saleorShippingMethods);
   } catch (error) {
