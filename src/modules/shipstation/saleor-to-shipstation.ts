@@ -39,6 +39,7 @@ const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
     unit = WeightUnitsEnum.G;
   }
 
+  // TODO: shouldn't we convert TONNE to KG?
   const weightMap: Record<WeightUnitsEnum, WeightUnits | undefined> = {
     G: WeightUnits.Grams,
     KG: undefined,
