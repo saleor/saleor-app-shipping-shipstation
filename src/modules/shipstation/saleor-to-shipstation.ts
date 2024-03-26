@@ -1,9 +1,6 @@
-import { WeightUnitsEnum } from "../../generated/graphql";
-import { Weight, WeightUnits } from "./ShipStation/types";
-
-export interface SumAndFormatSaleorWeights {
-  weights: Array<{ value: number; unit: WeightUnitsEnum }>;
-}
+import { CheckoutLine, CheckoutLineFragment, WeightUnitsEnum } from "../../../generated/graphql";
+import { notEmpty } from "../../lib/not-empty";
+import { Weight, WeightUnits } from "./types";
 
 /**
  * The function takes a list of Saleor weights and sums them up. Output follows Shipstation weight format.
@@ -14,7 +11,9 @@ export interface SumAndFormatSaleorWeights {
  * - If the unit is not supported, it throws an error
  * - All of the provided weights are in the same unit
  */
-export const sumAndFormatSaleorWeights = ({ weights }: SumAndFormatSaleorWeights): Weight => {
+const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
+  const weights = lines.map((line) => line.variant.weight).filter(notEmpty);
+
   if (weights.length === 0) {
     console.debug("No weights found, returning 0 grams");
     return {
@@ -53,4 +52,8 @@ export const sumAndFormatSaleorWeights = ({ weights }: SumAndFormatSaleorWeights
     value: value,
     units: convertedUnit,
   };
+};
+
+export const saleorToShipstation = {
+  mapSaleorLinesToWeight,
 };
