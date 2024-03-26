@@ -1,8 +1,7 @@
 import pino from "pino";
-import { ENV_CONFIG } from "../env-config";
 
 export const logger = pino({
-  level: ENV_CONFIG.LOG_LEVEL,
+  level: process.env.LOG_LEVEL || "info", // LOG_LEVEL is not imported from env-config to avoid dependency for testing purposes
   transport: {
     target: "pino-pretty",
   },
