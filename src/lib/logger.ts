@@ -7,3 +7,5 @@ export const logger = pino({
     target: "pino-pretty",
   },
 });
+
+export const createLogger = (name: string) => logger.child({ name });
