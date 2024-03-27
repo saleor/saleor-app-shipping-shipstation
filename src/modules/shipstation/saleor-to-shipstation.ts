@@ -1,9 +1,9 @@
-import { WeightUnitsEnum } from "../../generated/graphql";
-import { Weight, WeightUnits } from "./ShipStation/types";
+import { CheckoutLineFragment, WeightUnitsEnum } from "../../../generated/graphql";
+import { createLogger } from "../../lib/logger";
+import { notEmpty } from "../../lib/not-empty";
+import { Weight, WeightUnits } from "./types";
 
-export interface SumAndFormatSaleorWeights {
-  weights: Array<{ value: number; unit: WeightUnitsEnum }>;
-}
+const logger = createLogger("saleorToShipstation");
 
 /**
  * The function takes a list of Saleor weights and sums them up. Output follows Shipstation weight format.
@@ -14,9 +14,14 @@ export interface SumAndFormatSaleorWeights {
  * - If the unit is not supported, it throws an error
  * - All of the provided weights are in the same unit
  */
-export const sumAndFormatSaleorWeights = ({ weights }: SumAndFormatSaleorWeights): Weight => {
+// todo: test
+const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
+  const weights = lines.map((line) => line.variant.weight).filter(notEmpty);
+
   if (weights.length === 0) {
-    console.debug("No weights found, returning 0 grams");
+    // TODO: should we throw an error here?
+    logger.trace("No weights found, returning 0 grams");
+
     return {
       value: 0,
       units: WeightUnits.Grams,
@@ -34,6 +39,7 @@ export const sumAndFormatSaleorWeights = ({ weights }: SumAndFormatSaleorWeights
     unit = WeightUnitsEnum.G;
   }
 
+  // TODO: shouldn't we convert TONNE to KG?
   const weightMap: Record<WeightUnitsEnum, WeightUnits | undefined> = {
     G: WeightUnits.Grams,
     KG: undefined,
@@ -45,12 +51,15 @@ export const sumAndFormatSaleorWeights = ({ weights }: SumAndFormatSaleorWeights
   const convertedUnit = weightMap[unit];
 
   if (convertedUnit === undefined) {
-    console.error("Unsupported weight unit", unit);
-    throw new Error("Unsupported weight unit");
+    throw new Error(`${unit} is not a supported weight unit`);
   }
 
   return {
     value: value,
     units: convertedUnit,
   };
+};
+
+export const saleorToShipstation = {
+  mapSaleorLinesToWeight,
 };

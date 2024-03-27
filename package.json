@@ -1,5 +1,5 @@
 {
-  "name": "dummy-shipping-app",
+  "name": "shipstation-app",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -18,16 +18,19 @@
     "@saleor/app-sdk": "0.41.0",
     "@saleor/macaw-ui": "1.0.0-pre.4",
     "@urql/exchange-auth": "^1.0.0",
-    "@vitejs/plugin-react": "^3.0.1",
+    "@vitejs/plugin-react": "^4.2.1",
     "graphql": "^16.8.1",
     "graphql-tag": "^2.12.6",
     "jsdom": "^20.0.3",
     "next": "13.3.0",
+    "pino": "^8.19.0",
+    "pino-pretty": "^11.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "urql": "^4.0.2",
-    "vite": "^4.0.5",
-    "vitest": "^0.27.1"
+    "vite": "^5.2.6",
+    "vitest": "^1.4.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "3.3.1",

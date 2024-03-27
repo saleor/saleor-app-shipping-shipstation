@@ -1,9 +1,12 @@
 // Generated based on the ShipStation API documentation:
 
-import { Dimensions, Weight } from "./types";
+import { z } from "zod";
+import { ShipStationApiClient } from "./shipstation-api-client";
+import { createLogger } from "../../../lib/logger";
+import { Dimensions, Weight } from "../types";
 
 // https://www.shipstation.com/docs/api/shipments/get-rates/
-export interface GetRatesRequest {
+export type GetRatesRequest = {
   /**  Returns rates for the specified carrier. */
   carrierCode: string;
   /** Returns rates for the specified shipping service. */
@@ -39,41 +42,51 @@ export interface GetRatesRequest {
   confirmation?: string;
   /** Carriers may return different rates based on whether or not the address is commercial (false) or residential (true). Default value: false */
   residential?: boolean;
-}
-
-export interface GetRatesResponse {
-  serviceName: string;
-  serviceCode: string;
-  shipmentCost: number;
-  otherCost: number;
-}
-
-const GET_RATES_URL = "https://ssapi.shipstation.com/shipments/getrates";
-
-export interface FetchGetRatesProps {
-  input: GetRatesRequest;
-  auth: string;
-}
-
-export const fetchGetRates = async ({ input, auth }: FetchGetRatesProps) => {
-  console.log("fetchGetRates starts");
-
-  const response = await fetch(GET_RATES_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: auth,
-    },
-    body: JSON.stringify(input),
-  });
-
-  if (!response.ok) {
-    console.error(`Failed to fetch rates: ${response.statusText}`);
-    throw new Error(`Failed to fetch rates: ${response.statusText}`);
-  }
-
-  console.debug("fetchGetRates ok", response);
-
-  // TODO: Add response validation
-  return response.json() as Promise<GetRatesResponse[]>;
 };
+
+const shipStationRateSchema = z.object({
+  serviceCode: z.string(),
+  serviceName: z.string(),
+  shipmentCost: z.number(),
+  otherCost: z.number(),
+});
+
+const getRatesResponseSchema = z.array(shipStationRateSchema);
+
+export type GetRatesResponse = z.infer<typeof getRatesResponseSchema>;
+
+export class GetRatesClient {
+  private logger = createLogger("GetRatesClient");
+  constructor(private apiClient: ShipStationApiClient) {}
+
+  async getRates(input: GetRatesRequest) {
+    try {
+      this.logger.debug({ input }, "Getting rates with following input: ");
+      const response = await this.apiClient.query("/shipments/getrates", {
+        method: "POST",
+        body: input,
+      });
+
+      const parseResult = getRatesResponseSchema.safeParse(response);
+
+      if (!parseResult.success) {
+        this.logger.warn(
+          { json: response },
+          "Failed to provide detailed error message from ShipStation API."
+        );
+
+        throw new Error("The response from ShipStation API is in unexpected shape.");
+      }
+
+      return parseResult.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(
+          `Failed to get rates for carrier code: ${input.carrierCode}. ${error.message}`
+        );
+      }
+
+      throw error;
+    }
+  }
+}

@@ -1,7 +1,6 @@
 import { SaleorAsyncWebhook } from "@saleor/app-sdk/handlers/next";
 import { gql } from "urql";
 import { OrderCreatedWebhookPayloadFragment } from "../../../../generated/graphql";
-import { DummyExternalShippingAPI } from "../../../lib/dummy-shipping";
 import { saleorApp } from "../../../saleor-app";
 
 const OrderCreatedWebhookPayload = gql`
@@ -47,9 +46,8 @@ export default orderCreatedWebhook.createHandler((req, res, ctx) => {
   // To get the chosen Shipstation shipping method, decode the shipping method ID - eg app:saleor.app:usps_priority_mail_international
   // the last part of the shipping method ID can be used to create the Order in the API and later used for creating the label
 
-  const dummyAPI = new DummyExternalShippingAPI();
   // send selected shipping method on order to your shipping provider API
-  dummyAPI.setShippingMethodForOrder(payload.order?.deliveryMethod);
+
   res.status(200).end();
 });
 
