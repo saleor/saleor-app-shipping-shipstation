@@ -73,11 +73,29 @@ export default shippingListMethodsForCheckoutWebhook.createHandler(async (req, r
     apiSecret: ENV_CONFIG.SHIPSTATION_API_SECRET,
   });
 
-  const checkoutService = new CheckoutShippingMethodService(apiClient);
-
   try {
+    const checkout = payload.checkout;
+
+    if (!checkout) {
+      throw new Error("No checkout found in payload");
+    }
+
+    const shippingAddress = checkout.shippingAddress;
+
+    if (!shippingAddress) {
+      throw new Error("No shipping address found in checkout");
+    }
+
+    const lines = checkout.lines;
+    const toCountryCode = shippingAddress.country.code;
+    const toPostalCode = shippingAddress.postalCode;
+
+    const checkoutService = new CheckoutShippingMethodService(apiClient);
+
     const saleorShippingMethods = await checkoutService.getShippingMethodsForCheckout({
-      payload,
+      lines,
+      toCountryCode,
+      toPostalCode,
       carrierCodes,
       fromPostalCode,
     });

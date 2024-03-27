@@ -1,5 +1,6 @@
-import { ShippingListMethodsPayloadFragment } from "../generated/graphql";
+import { CheckoutLineFragment, ShippingListMethodsPayloadFragment } from "../generated/graphql";
 import { createLogger } from "./lib/logger";
+import { SaleorShippingMethod } from "./lib/types";
 import { GetRatesClient } from "./modules/shipstation/api/get-rates";
 import { ShipStationApiClient } from "./modules/shipstation/api/shipstation-api-client";
 import { saleorToShipstation } from "./modules/shipstation/saleor-to-shipstation";
@@ -9,35 +10,27 @@ export class CheckoutShippingMethodService {
   private logger = createLogger("CheckoutShippingMethodService");
   constructor(private apiClient: ShipStationApiClient) {}
 
+  /**
+   * Get shipping methods for a checkout
+   * @param toCountryCode The country code of the destination
+   * @param lines The lines in the checkout
+   * @param carrierCodes The carrier codes to get rates for
+   * @param fromPostalCode The postal code of the origin
+   * @param toPostalCode The postal code of the destination
+   */
   async getShippingMethodsForCheckout({
-    payload,
+    toCountryCode,
+    lines,
     carrierCodes,
     fromPostalCode,
+    toPostalCode,
   }: {
-    payload: ShippingListMethodsPayloadFragment;
     carrierCodes: string[];
     fromPostalCode: string;
-  }) {
-    const checkout = payload.checkout;
-
-    if (!checkout) {
-      // the checkout payload is missing
-      // return 200 OK to Saleor to acknowledge the webhook
-      // console.debug("No checkout data in the payload");
-      // res.status(200).end();
-      throw new Error("No checkout data found in the webhook payload");
-    }
-
-    const shippingAddress = checkout.shippingAddress;
-
-    if (!shippingAddress) {
-      // the address payload is missing
-      // return 200 OK to Saleor to acknowledge the webhook
-      // console.debug("No shipping address in the payload");
-      // res.status(200).end();
-      throw new Error("No shipping address found in the webhook payload");
-    }
-
+    toCountryCode: string;
+    toPostalCode: string;
+    lines: CheckoutLineFragment[];
+  }): Promise<SaleorShippingMethod[]> {
     this.logger.debug("Getting rates for the following carrier codes: %o", carrierCodes);
 
     const client = new GetRatesClient(this.apiClient);
@@ -48,9 +41,9 @@ export class CheckoutShippingMethodService {
         serviceCode: null,
         packageCode: null,
         fromPostalCode,
-        toCountry: shippingAddress.country.code,
-        toPostalCode: shippingAddress.postalCode,
-        weight: saleorToShipstation.mapSaleorLinesToWeight(checkout.lines),
+        toCountry: toCountryCode,
+        toPostalCode,
+        weight: saleorToShipstation.mapSaleorLinesToWeight(lines),
       });
     });
 
