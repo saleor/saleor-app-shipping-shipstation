@@ -22,6 +22,8 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.json') }}-
       - name: Install dependencies
         run: pnpm install
+      - name: Generate
+        run: pnpm generate
       - name: Test
         run: pnpm test
       - name: Build project
