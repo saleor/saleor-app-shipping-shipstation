@@ -1,4 +1,4 @@
-import { CheckoutLineFragment, ShippingListMethodsPayloadFragment } from "../generated/graphql";
+import { CheckoutLineFragment } from "../generated/graphql";
 import { createLogger } from "./lib/logger";
 import { SaleorShippingMethod } from "./lib/types";
 import { GetRatesClient } from "./modules/shipstation/api/get-rates";
@@ -44,6 +44,7 @@ export class CheckoutShippingMethodService {
         toCountry: toCountryCode,
         toPostalCode,
         weight: saleorToShipstation.mapSaleorLinesToWeight(lines),
+        dimensions: saleorToShipstation.mapSaleorLinesToPackageDimensions(lines),
       });
     });
 

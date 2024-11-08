@@ -15,6 +15,13 @@ const CheckoutLine = gql`
         unit
         value
       }
+      product {
+        packageSize: attribute(slug: "package-size") {
+          values {
+            slug
+          }
+        }
+      }
     }
   }
 `;

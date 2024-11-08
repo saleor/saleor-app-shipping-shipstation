@@ -1,7 +1,14 @@
 import { CheckoutLineFragment, WeightUnitsEnum } from "../../../generated/graphql";
 import { createLogger } from "../../lib/logger";
 import { notEmpty } from "../../lib/not-empty";
-import { Weight, WeightUnits } from "./types";
+import {
+  Dimensions,
+  PackageDimensionsMap,
+  PackageType,
+  PackageTypeSummary,
+  Weight,
+  WeightUnits,
+} from "./types";
 
 const logger = createLogger("saleorToShipstation");
 
@@ -14,7 +21,6 @@ const logger = createLogger("saleorToShipstation");
  * - If the unit is not supported, it throws an error
  * - All of the provided weights are in the same unit
  */
-// todo: test
 const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
   const weights = lines.map((line) => line.variant.weight).filter(notEmpty);
 
@@ -60,6 +66,60 @@ const mapSaleorLinesToWeight = (lines: CheckoutLineFragment[]): Weight => {
   };
 };
 
+// Count the number of each package type in the checkout lines. The size is based on product attribute with slug `package-size`
+// If no package size is found, it defaults to envelope
+export const summaryCheckoutLinesPackageTypes = (
+  lines: CheckoutLineFragment[]
+): PackageTypeSummary => {
+  const packageTypesCounter: PackageTypeSummary = {
+    envelope: 0,
+    smallBox: 0,
+    largeBox: 0,
+  };
+
+  lines.forEach((line) => {
+    const packageSize = line.variant.product?.packageSize?.values[0]?.slug;
+
+    switch (packageSize) {
+      case "smallBox":
+        packageTypesCounter.smallBox++;
+        break;
+      case "largeBox":
+        packageTypesCounter.largeBox++;
+        break;
+      default:
+        packageTypesCounter.envelope++;
+        break;
+    }
+  });
+
+  return packageTypesCounter;
+};
+
+// Operates on assumption, that each box size can contain certain amount of the smaller box sizes
+// If arbitrary limits are exceeded, bigger box type will be chosen
+export const choosePackageType = (packageTypes: PackageTypeSummary): PackageType => {
+  if (packageTypes.envelope <= 5 && packageTypes.smallBox === 0 && packageTypes.largeBox === 0) {
+    return "envelope";
+  }
+
+  if (packageTypes.envelope <= 20 && packageTypes.smallBox <= 5 && packageTypes.largeBox === 0) {
+    return "smallBox";
+  }
+
+  return "largeBox";
+};
+
+export const mapSaleorLinesToPackageDimensions = (lines: CheckoutLineFragment[]): Dimensions => {
+  const summary = summaryCheckoutLinesPackageTypes(lines);
+  const packageType = choosePackageType(summary);
+
+  return PackageDimensionsMap[packageType];
+};
+
 export const saleorToShipstation = {
   mapSaleorLinesToWeight,
+  summaryCheckoutLinesPackageTypes,
+  choosePackageType,
+  mapSaleorLinesToPackageDimensions,
 };

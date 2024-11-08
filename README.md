@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-  <h1>Dummy Shipping App x Shipstation</h1>
+  <h1>Example Shipping App x Shipstation</h1>
 </div>
 
 <div align="center">
@@ -14,7 +14,7 @@
 <div align="center">
   <a href="https://saleor.io/">Website</a>
   <span> | </span>
-  <a href="https://docs.saleor.io/docs/3.x/developer/checkout/address">Docs</a>
+  <a href="https://docs.saleor.io/">Docs</a>
 </div>
 
 ## Introduction
@@ -41,7 +41,7 @@ sequenceDiagram
     SF ->>+ SALEOR: checkout.shippingMethods
     SALEOR ->>+ SSA: sync webhook <br> SHIPPING_LIST_METHODS_FOR_CHECKOUT
     SSA ->> SSA: calculate weight
-    SSA ->> SSA: [todo] determine the package size
+    SSA ->> SSA: determine the package size
     SSA ->>+ SS: fetch getRates
     SS ->>- SSA: available rates
     SSA ->> SSA: format rates to Saleor response type
@@ -55,6 +55,26 @@ sequenceDiagram
     SF ->> C: Checkout
 ```
 
+#### Determining the weight of the package
+
+The weight is the sum of of all of the items weights (`CheckoutLine.variant.weight`) and supports grams, ounces and pounds.
+
+#### Determining the size of the package
+
+Example code is assuming 3 types of available packages:
+- envelope
+- small box
+- big box
+
+The types and their sizes are defined in `/src/modules/shipstation/types.ts`.
+
+When shipping methods are requested, the App checks the value of Product attribute with slug "package-size", and chooses which package will fit whole checkout. Eg.: 
+- Checkout contains 2 "envelope" sized items. Since it's below limit of the "envelope" package (5pcs), "envelope" will be used.
+- Checkout contains 2 "envelope" and 1 "big box". The only package which can fit all the products will be "big box"
+
+Code can be found in file `/src/modules/shipstation/saleor-to-shipstation.ts`.
+
+
 ### Subscriptions
 
 #### ShippingListMethodsForCheckout
@@ -63,7 +83,7 @@ You can use the third-party API to request shipping methods for a given checkout
 
 #### OrderCreated
 
-Used to tell third-party API that checkout session is completed and order with shipping method is created. [Docs](https://docs.saleor.io/docs/3.x/api-reference/orders/objects/order-created)
+Placeholder webhook which can be used to notify service responsible for preparing shipping labels. [Docs](https://docs.saleor.io/docs/3.x/api-reference/orders/objects/order-created)
 
 ### Mutations
 
@@ -86,58 +106,7 @@ Before you start, make sure you have installed:
 
 - [Node.js](https://nodejs.org/en/)
 - [pnpm](https://pnpm.io/)
-- [Saleor CLI](https://docs.saleor.io/docs/3.x/cli) - optional, but recommended
 - [Bruno](https://www.usebruno.com/) - for API calls
-
-### With CLI
-
-The easiest way to set up a Saleor app is by using the Saleor CLI.
-
-[Saleor CLI](https://github.com/saleor/saleor-cli) is designed to save you from the repetitive chores around Saleor development, including creating Apps. It will take the burden of spawning new apps locally, connecting them with Saleor environments, and establishing a tunnel for local development in seconds.
-
-[Full Saleor CLI reference](https://docs.saleor.io/docs/3.x/cli)
-
-If you don't have a (free developer) Saleor Cloud account, create one with the following command:
-
-```
-saleor register
-```
-
-You will also have to login with:
-
-```
-saleor login
-```
-
-Now you're ready to create your first App:
-
-```
-saleor app template [your-app-name]
-```
-
-In this step, Saleor CLI will:
-
-- clone this repository to the specified folder
-- install dependencies
-- ask you whether you'd like to install the app in the selected Saleor environment
-- create `.env` file
-- start the app in development mode
-
-Having your app ready, the final thing you want to establish is a tunnel with your Saleor environment. Go to your app's directory first and run:
-
-```
-saleor app tunnel
-```
-
-Your local application should be available now to the outside world (Saleor instance) for accepting all the events via webhooks.
-
-A quick note: the next time you come back to your project, it is enough to launch your app in a standard way (and then launch your tunnel as described earlier):
-
-```
-pnpm dev
-```
-
-### Without CLI
 
 1. Install the dependencies by running:
 
@@ -154,7 +123,9 @@ pnpm dev
 3. Expose local environment using tunnel:
    Use tunneling tools like [localtunnel](https://github.com/localtunnel/localtunnel) or [ngrok](https://ngrok.com/).
 
-4. Install the application in your dashboard:
+4. Create .env file with URL of the exposed app and required API keys (reference in `.env.example`)
+
+5. Install the application in your dashboard:
 
 If you use Saleor Cloud or your local server is exposed, you can install your app by following this link:
 
@@ -194,7 +165,7 @@ If you have your application up and running inside Saleor Dashboard now its time
 
 ### Limitations
 
-- carriers list is hardcoded in the envs, and at the moment only one is supported
+- carriers list (eg. stamps_com, ups) is hardcoded in the envs, and at the moment only one is supported
 - all saleor variants have to follow the same weight unit
 - the app assumes the shipping rates returned from the Shipstation are using USD as currency - channel configuration should follow this format
 - considering SLIM shipstation rate limits (40 req/s) mitigation measures should be taken
