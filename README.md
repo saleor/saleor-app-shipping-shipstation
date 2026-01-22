@@ -17,6 +17,9 @@
   <a href="https://docs.saleor.io/">Docs</a>
 </div>
 
+> [!IMPORTANT]
+> This app was migrated to Saleor examples repo: https://github.com/saleor/examples/tree/main/example-app-shipstation
+
 ## Introduction
 
 This app is an example of how to integrate with the Saleor shipping API. The diagram below illustrates the flow of requests:
